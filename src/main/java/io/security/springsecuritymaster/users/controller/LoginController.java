@@ -14,5 +14,4 @@ public class LoginController {
     public String signup() {
         return "login/signup";
     }
-
 }
