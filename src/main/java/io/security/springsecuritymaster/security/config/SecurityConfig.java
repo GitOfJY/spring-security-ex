@@ -73,14 +73,14 @@ public class SecurityConfig {
                         .requestMatchers("/css/**", "/images/**", "/js/**", "/favicon.*", "/*/icon-*").permitAll()
                         .anyRequest().permitAll())
                 .csrf(AbstractHttpConfigurer::disable)
-                .addFilterBefore(restAuthenticationFilter(authenticationManager), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(restAuthenticationFilter(http, authenticationManager), UsernamePasswordAuthenticationFilter.class)
                 .authenticationManager(authenticationManager)
         ;
         return http.build();
     }
 
-    private RestAuthenticationFilter restAuthenticationFilter(AuthenticationManager authenticationManager) {
-        RestAuthenticationFilter restAuthenticationFilter = new RestAuthenticationFilter();
+    private RestAuthenticationFilter restAuthenticationFilter(HttpSecurity http, AuthenticationManager authenticationManager) {
+        RestAuthenticationFilter restAuthenticationFilter = new RestAuthenticationFilter(http);
         restAuthenticationFilter.setAuthenticationManager(authenticationManager);
         restAuthenticationFilter.setAuthenticationSuccessHandler(restSuccessHandler);
         restAuthenticationFilter.setAuthenticationFailureHandler(failureHandler);
