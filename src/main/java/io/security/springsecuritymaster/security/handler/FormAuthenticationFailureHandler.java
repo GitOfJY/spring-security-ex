@@ -1,4 +1,4 @@
-package io.security.springsecuritymaster.handler;
+package io.security.springsecuritymaster.security.handler;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

@@ -1,4 +1,4 @@
-package io.security.springsecuritymaster.handler;
+package io.security.springsecuritymaster.security.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
