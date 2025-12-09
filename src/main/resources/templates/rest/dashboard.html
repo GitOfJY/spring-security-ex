@@ -57,58 +57,69 @@
             background-color: #4e73df; /* 마우스 오버시 배경색 */
             color: #fff; /* 마우스 오버시 글자색 */
         }
-        /* 중앙 로그인 폼 스타일 */
-        .login-form {
-            max-width: 400px;
-            margin: 30px auto;
-            padding: 20px;
-            background-color: #2e2e2e; /* 어두운 폼 배경색 */
-            border-radius: 5px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
-        }
-        .login-form h2 {
-            color: #fff; /* 밝은 글자색 */
-            margin-bottom: 20px;
-        }
-        .login-form .form-control {
-            background-color: #3a3b45; /* 어두운 입력 필드 배경색 */
-            color: #fff; /* 밝은 입력 필드 글자색 */
-            border: none;
-        }
-        .login-form .btn-primary {
-            background-color: #4e73df; /* 밝은 버튼 색상 */
-            border: none;
-        }
     </style>
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script>
+        function restCall(url) {
+
+            fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+                .then(response => {
+                    if(response.ok){
+                        response.json().then(function (data) {
+                            console.log(data);
+                            document.querySelector("#content").textContent=JSON.stringify(data, null, 2);
+                        })
+                    }else if(response.status === 401){
+                        console.log(response.statusText)
+                        document.querySelector("#content").textContent=response.status;
+                    }else if(response.status === 403){
+                        console.log(response.statusText)
+                        document.querySelector("#content").textContent=response.status;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error during login:', error);
+                });
+        }
+        function logout() {
+
+            fetch('/api/logout', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+                .then(response => {
+                    if(response.ok){
+                        window.location.replace('/api')
+                    }
+                })
+                .catch(error => {
+                    console.error('Error during login:', error);
+                });
+        }
+    </script>
 </head>
 <body>
-<div th:replace="~{layout/header::header}"></div>
+<div th:replace="~{rest/layout/header::header}"></div>
 <div class="container-fluid">
     <div class="row">
         <div class="col-md-2 sidebar">
-            <div th:replace="~{layout/sidebar::sidebar}"></div>
+            <div th:replace="~{rest/layout/sidebar::sidebar}"></div>
         </div>
         <div class="col-md-10 content">
-            <div class="login-form">
-                <h2>Login</h2>
-                <div th:if="${param.error}" class="form-group">
-                    <span th:text="${exception}?: '잘못된 아이디나 암호입니다'" class="alert alert-danger"></span>
-                </div>
-                <form th:action="@{/login}" method="post">
-                    <input type="hidden" th:value="secret" name="secret_key" />
-                    <div class="form-group">
-                        <label for="username">Username</label>
-                        <input type="text" class="form-control" id="username" name="username" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="password">Password</label>
-                        <input type="password" class="form-control" id="password" name="password" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Login</button>
-                </form>
+            <div>
+                <h2>대시보드</h2>
+                <p id="content">환영합니다! 여기에 대시보드 관련 정보와 분석 데이터가 표시됩니다.</p>
             </div>
         </div>
     </div>

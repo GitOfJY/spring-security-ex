@@ -1,5 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+<meta name="_csrf" th:content="${_csrf.token}"/>
+<meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 <head>
     <title>Dashboard</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
@@ -83,32 +85,85 @@
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script>
+        function login() {
+
+            const csrfHeader = $('meta[name="_csrf_header"]').attr('content');
+            const csrfToken = $('meta[name="_csrf"]').attr('content')
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            fetch('/api/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    [csrfHeader]: csrfToken
+                },
+                body: JSON.stringify({ username, password }),
+            })
+                .then(response => {
+                    response.json().then(function (data) {
+                        console.log(data);
+                        window.location.replace('/api')
+                    })
+                })
+                .catch(error => {
+                    console.error('Error during login:', error);
+                });
+        }
+        function restCall(url) {
+
+            fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+                .then(response => {
+                    if(response.ok){
+                        response.json().then(function (data) {
+                            console.log(data);
+                            document.querySelector("#content").textContent=JSON.stringify(data, null, 2);
+                        })
+                    }else if(response.status === 401){
+                        console.log(response.statusText)
+                        document.querySelector("#content").textContent=response.status;
+                    }else if(response.status === 403){
+                        console.log(response.statusText)
+                        document.querySelector("#content").textContent=response.status;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error during login:', error);
+                });
+        }
+    </script>
 </head>
 <body>
-<div th:replace="~{layout/header::header}"></div>
+<div th:replace="~{rest/layout/header::header}"></div>
 <div class="container-fluid">
     <div class="row">
         <div class="col-md-2 sidebar">
-            <div th:replace="~{layout/sidebar::sidebar}"></div>
+            <div th:replace="~{rest/layout/sidebar::sidebar}"></div>
         </div>
         <div class="col-md-10 content">
-            <div class="login-form">
+            <div class="login-form" id="content">
                 <h2>Login</h2>
                 <div th:if="${param.error}" class="form-group">
-                    <span th:text="${exception}?: '잘못된 아이디나 암호입니다'" class="alert alert-danger"></span>
+                    <span th:text="${exception} ?: '잘못된 아이디나 암호입니다'" class="alert alert-danger"></span>
                 </div>
-                <form th:action="@{/login}" method="post">
-                    <input type="hidden" th:value="secret" name="secret_key" />
-                    <div class="form-group">
-                        <label for="username">Username</label>
-                        <input type="text" class="form-control" id="username" name="username" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="password">Password</label>
-                        <input type="password" class="form-control" id="password" name="password" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Login</button>
-                </form>
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" class="form-control" id="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" class="form-control" id="password" required>
+                </div>
+                <button onclick="login()" class="btn btn-primary">Login</button>
             </div>
         </div>
     </div>
