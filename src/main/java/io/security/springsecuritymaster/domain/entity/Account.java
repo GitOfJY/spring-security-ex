@@ -1,9 +1,11 @@
 package io.security.springsecuritymaster.domain.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Data;
+import lombok.ToString;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @Entity
@@ -12,8 +14,18 @@ public class Account {
     @GeneratedValue
     private Long id;
 
+    @Column
     private String username;
-    private String password;
+
+    @Column
     private int age;
-    private String roles;
+
+    @Column
+    private String password;
+
+    @ManyToMany(fetch = FetchType.LAZY, cascade={CascadeType.MERGE})
+    @JoinTable(name = "account_roles", joinColumns = { @JoinColumn(name = "account_id") }, inverseJoinColumns = {
+            @JoinColumn(name = "role_id") })
+    @ToString.Exclude
+    private Set<Role> userRoles = new HashSet<>();
 }
